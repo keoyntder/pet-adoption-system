@@ -3,138 +3,230 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= esc($title) ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?= esc($title ?? 'Available Pets') ?></title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+            background: #f5f7f5;
+            color: #24352b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            margin: 5px 8px 5px 0;
+            color: #17683b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .pet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .pet-card {
+            overflow: hidden;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .07);
+        }
+
+        .pet-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+            background: #e4eae5;
+        }
+
+        .image-placeholder {
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e4eae5;
+            color: #607365;
+        }
+
+        .pet-info {
+            padding: 18px;
+        }
+
+        .pet-info h2 {
+            margin: 0 0 12px;
+        }
+
+        .pet-info p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: #e0f4e5;
+            color: #17683b;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .view-button {
+            display: block;
+            margin-top: 16px;
+            padding: 11px;
+            border-radius: 7px;
+            background: #17683b;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .empty-state {
+            padding: 35px;
+            background: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<h1><?= esc($title) ?></h1>
+<div class="container">
 
-<p>
-    <a href="<?= site_url('admin/dashboard') ?>">Dashboard</a> |
-    <a href="<?= site_url('admin/pets') ?>">Manage Pets</a> |
-    <a href="<?= site_url('logout') ?>">Logout</a>
-</p>
+    <header class="page-header">
+        <div>
+            <h1>Find Your New Best Friend</h1>
+            <p>Meet the pets waiting for a loving home.</p>
+        </div>
 
-<?php if (session()->getFlashdata('success')): ?>
-    <p style="color: green;">
-        <?= esc(session()->getFlashdata('success')) ?>
-    </p>
-<?php endif; ?>
+        <nav class="nav-links">
+            <a href="<?= site_url('pets') ?>">Browse Pets</a>
+            <a href="<?= site_url('my-applications') ?>">My Applications</a>
+            <a href="<?= site_url('logout') ?>">Logout</a>
+        </nav>
+    </header>
 
-<?php if (session()->getFlashdata('error')): ?>
-    <p style="color: red;">
-        <?= esc(session()->getFlashdata('error')) ?>
-    </p>
-<?php endif; ?>
-
-<?php if (empty($applications)): ?>
-    <p>No adoption applications have been submitted yet.</p>
-<?php else: ?>
-
-    <?php foreach ($applications as $application): ?>
-        <hr>
-
-        <h2>
-            Application #<?= esc($application['id']) ?>:
-            <?= esc($application['pet_name']) ?>
-        </h2>
-
-        <p>
-            <strong>Pet:</strong>
-            <?= esc($application['pet_species']) ?>
-            <?= esc($application['pet_breed'] ?? 'Unknown breed') ?>
+    <?php if (session()->getFlashdata('success')): ?>
+        <p style="color: green;">
+            <?= esc(session()->getFlashdata('success')) ?>
         </p>
+    <?php endif; ?>
 
-        <p>
-            <strong>Pet status:</strong>
-            <?= esc(ucfirst($application['pet_status'])) ?>
+    <?php if (session()->getFlashdata('error')): ?>
+        <p style="color: red;">
+            <?= esc(session()->getFlashdata('error')) ?>
         </p>
+    <?php endif; ?>
 
-        <p>
-            <strong>Adopter:</strong>
-            <?= esc($application['adopter_name']) ?>
-        </p>
+    <?php if (empty($pets)): ?>
 
-        <p>
-            <strong>Email:</strong>
-            <?= esc($application['adopter_email']) ?>
-        </p>
+        <div class="empty-state">
+            <h2>No pets available right now</h2>
+            <p>Please check back later for pets looking for a home.</p>
+        </div>
 
-        <p>
-            <strong>Phone:</strong>
-            <?= esc($application['adopter_phone'] ?? 'Not provided') ?>
-        </p>
+    <?php else: ?>
 
-        <p>
-            <strong>Application date:</strong>
-            <?= esc($application['application_date']) ?>
-        </p>
+        <div class="pet-grid">
 
-        <p>
-            <strong>Reason for adoption:</strong><br>
-            <?= nl2br(esc($application['reason'])) ?>
-        </p>
+            <?php foreach ($pets as $pet): ?>
+                <article class="pet-card">
 
-        <p>
-            <strong>Current status:</strong>
-            <?= esc(ucfirst($application['status'])) ?>
-        </p>
+                    <?php if (! empty($pet['image'])): ?>
+                        <img
+                            class="pet-image"
+                            src="<?= base_url('uploads/pets/' . $pet['image']) ?>"
+                            alt="<?= esc($pet['name']) ?>"
+                            loading="lazy"
+                        >
+                    <?php else: ?>
+                        <div class="image-placeholder">
+                            <span>No image available</span>
+                        </div>
+                    <?php endif; ?>
 
-        <?php if (! empty($application['admin_notes'])): ?>
-            <p>
-                <strong>Previous admin notes:</strong><br>
-                <?= nl2br(esc($application['admin_notes'])) ?>
-            </p>
-        <?php endif; ?>
+                    <div class="pet-info">
 
-        <?php if ($application['status'] === 'pending'): ?>
-            <form
-                action="<?= site_url('admin/applications/update/' . $application['id']) ?>"
-                method="post"
-            >
-                <?= csrf_field() ?>
+                        <h2><?= esc($pet['name']) ?></h2>
 
-                <label for="notes-<?= esc($application['id']) ?>">
-                    Admin notes
-                </label><br>
+                        <p>
+                            <strong>Species:</strong>
+                            <?= esc($pet['species']) ?>
+                        </p>
 
-                <textarea
-                    id="notes-<?= esc($application['id']) ?>"
-                    name="admin_notes"
-                    rows="3"
-                    maxlength="2000"
-                    style="width: 100%; max-width: 500px;"
-                    placeholder="Optional review notes"
-                ></textarea>
+                        <p>
+                            <strong>Breed:</strong>
+                            <?= esc($pet['breed'] ?: 'Unknown') ?>
+                        </p>
 
-                <br><br>
+                        <p>
+                            <strong>Sex:</strong>
+                            <?= esc($pet['sex']) ?>
+                        </p>
 
-                <button
-                    type="submit"
-                    name="status"
-                    value="approved"
-                    onclick="return confirm('Approve this application and mark the pet as adopted?');"
-                >
-                    Approve Application
-                </button>
+                        <p>
+                            <strong>Age:</strong>
+                            <?= esc($pet['age'] !== null && $pet['age'] !== ''
+                                ? $pet['age'] . ' year(s)'
+                                : 'Unknown') ?>
+                        </p>
 
-                <button
-                    type="submit"
-                    name="status"
-                    value="rejected"
-                    onclick="return confirm('Reject this application?');"
-                >
-                    Reject Application
-                </button>
-            </form>
-        <?php else: ?>
-            <p>This application has already been reviewed.</p>
-        <?php endif; ?>
+                        <p>
+                            <span class="status">
+                                <?= esc(ucfirst($pet['status'])) ?>
+                            </span>
+                        </p>
 
-    <?php endforeach; ?>
+                        <a
+                            class="view-button"
+                            href="<?= site_url('pets/' . $pet['id']) ?>"
+                        >
+                            View Details and Apply
+                        </a>
 
-<?php endif; ?>
+                    </div>
+                </article>
+            <?php endforeach; ?>
+
+        </div>
+
+    <?php endif; ?>
+
+</div>
 
 </body>
 </html>
