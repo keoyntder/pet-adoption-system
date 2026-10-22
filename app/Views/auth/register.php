@@ -9,10 +9,25 @@
 <body>
     <h1>Create an Account</h1>
 
-    <?php if (session()->getFlashdata('error')): ?>
-        <p><?= esc(session()->getFlashdata('error')) ?></p>
-    <?php endif; ?>
+   <?php $errors = session()->getFlashdata('errors') ?? []; ?>
 
+<?php if (! empty($errors)): ?>
+    <div class="validation-errors">
+        <ul>
+            <?php foreach ($errors as $error): ?>
+                <li><?= esc($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
+
+<?php if (session()->getFlashdata('error')): ?>
+    <p><?= esc(session()->getFlashdata('error')) ?></p>
+<?php endif; ?>
+
+<?php if (session()->getFlashdata('success')): ?>
+    <p><?= esc(session()->getFlashdata('success')) ?></p>
+<?php endif; ?>
     <form action="<?= site_url('register') ?>" method="post">
         <?= csrf_field() ?>
 
