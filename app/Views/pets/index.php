@@ -10,7 +10,11 @@
     <h1>Welcome, <?= esc(session()->get('full_name')) ?>!</h1>
     <p>Find your new best friend.</p>
 
-    <a href="<?= site_url('logout') ?>">Logout</a>
+    <nav>
+        <a href="<?= site_url('my-applications') ?>">My Applications</a>
+        |
+        <a href="<?= site_url('logout') ?>">Logout</a>
+    </nav>
 
     <hr>
 
@@ -22,16 +26,24 @@
         <?php foreach ($pets as $pet): ?>
             <article>
                 <h3><?= esc($pet['name']) ?></h3>
-                <p>Species: <?= esc($pet['species']) ?></p>
-                <p>Breed: <?= esc($pet['breed'] ?? 'Unknown') ?></p>
-                <p>Status: <?= esc($pet['status']) ?></p>
+
+                <p>
+                    Species: <?= esc($pet['species']) ?>
+                </p>
+
+                <p>
+                    Breed: <?= esc($pet['breed'] ?? 'Unknown') ?>
+                </p>
+
+                <p>
+                    Status: <?= esc($pet['status']) ?>
+                </p>
+
                 <a href="<?= site_url('pets/' . $pet['id']) ?>">
-                    <a href="<?= site_url('my-applications') ?>">
-    My Applications
-</a>
-    View Details and Apply
-</a>
+                    View Details and Apply
+                </a>
             </article>
+
             <hr>
         <?php endforeach; ?>
     <?php endif; ?>
